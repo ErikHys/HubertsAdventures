@@ -1,3 +1,5 @@
+package FactoryToHQ;
+
 import FactoryToHQ.Hubert;
 import FactoryToHQ.SimulateRun;
 import utils.Location;
@@ -15,7 +17,7 @@ public class Week5And6 {
 
 
         int[] steps = new int[]{1, 2, 4, 5, 6};
-        double[] aplhas = new double[]{0.7, 0.3, 0.1, 0.05};
+        double[] aplhas = new double[]{0.3, 0.1, 0.05};
         double[] epsilons = new double[]{0.2, 0.1, 0.05, 0.01};
         ArrayList<Thread> threads = new ArrayList<>();
         for (int step: steps) {

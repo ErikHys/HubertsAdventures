@@ -1,3 +1,5 @@
+package GlidingHubert;
+
 import GlidingHubert.Hubert;
 import utils.ReadAndWrite;
 

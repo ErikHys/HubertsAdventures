@@ -8,8 +8,8 @@ public class Hubert {
     protected final Random random;
     protected final int[][] grid;
     protected final int height;
-    protected int y;
     protected final int width;
+    protected int y;
     protected int x;
 
     /**
@@ -55,5 +55,13 @@ public class Hubert {
      */
     public boolean finished(int x, int y) {
         return this.x == x && this.y == y;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
     }
 }
