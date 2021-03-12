@@ -37,7 +37,7 @@ public class Velocity {
 
     /**
      *
-     * @return the horizontal velocity, air horizontal + wind horizontal
+     * @return The horizontal velocity, air horizontal + wind horizontal
      */
     public int getHor(){
         return vAirHor + vWindHor;

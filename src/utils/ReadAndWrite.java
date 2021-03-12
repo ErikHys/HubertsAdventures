@@ -1,5 +1,7 @@
 package utils;
 
+import GlidingHubert.LeftRight;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -41,10 +43,25 @@ public class ReadAndWrite {
      * @throws IOException
      */
     public static void writePath(ArrayList<Location> path, String name) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(name));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("paths/" + name));
         for (Location l: path){
-            writer.write("paths/" + l.x + " " + l.y + "\n");
+            writer.write(l.x + " " + l.y + "\n");
         }
         writer.close();
+    }
+
+    public static ArrayList<Sars<Location, LeftRight, Integer>> readSarsPath(String fileName) throws FileNotFoundException {
+        File file = new File(fileName);
+        Scanner sc = new Scanner(file);
+        ArrayList<Sars<Location, LeftRight, Integer>> txtPath = new ArrayList<>();
+        while (sc.hasNext()){
+            String[] rawInput = sc.nextLine().split("\t");
+            Location s = new Location(Integer.parseInt(rawInput[1])-1, Integer.parseInt(rawInput[0])-1);
+            LeftRight a = Integer.parseInt(rawInput[2]) == 2 ? LeftRight.RIGHT : LeftRight.LEFT;
+            int r = Integer.parseInt(rawInput[3]);
+            Location sPrime = new Location(Integer.parseInt(rawInput[5])-1, Integer.parseInt(rawInput[4])-1);
+            txtPath.add(new Sars<Location, LeftRight, Integer>(s, a, r, sPrime));
+        }
+        return txtPath;
     }
 }

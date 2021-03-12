@@ -3,8 +3,7 @@ package GlidingHubert;
 import utils.Location;
 import utils.Pair;
 import utils.ReadAndWrite;
-
-import javax.swing.*;
+import utils.Sars;
 import java.util.ArrayList;
 
 public class Hubert extends utils.Hubert {
@@ -12,7 +11,7 @@ public class Hubert extends utils.Hubert {
     private final Velocity velocity;
     private final int[][] windVert;
     private final int[][] windHor;
-    private final int[][][] actionValue;
+    private final double[][][] actionValue;
     private final Pair<Integer, Location>[][][] model;
     private final ArrayList<Pair<LeftRight, Location>> visitedStateActions;
     private final double alpha;
@@ -25,17 +24,17 @@ public class Hubert extends utils.Hubert {
         this.windHor = windHor;
         this.alpha = alpha;
         this.lam = lambda;
-        actionValue = new int[height][width][2];
+        actionValue = new double[height][width][2];
         model = new Pair[height][width][2];
         visitedStateActions = new ArrayList<Pair<LeftRight,Location>>();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 for (int a = 0; a < 2; a++) {
                     if(y == 14 && x == 54) {
-                        actionValue[y][x][a] = 1;
+                        actionValue[y][x][a] = 1.0;
                     }
                     else {
-                        actionValue[y][x][a] = 0;
+                        actionValue[y][x][a] = 0.0;
                     }
                 }
             }
@@ -72,7 +71,7 @@ public class Hubert extends utils.Hubert {
 
         // Add state action combination to a list of visited combinations
         if(model[oldState.y][oldState.x][action.getValue()] == null){
-            visitedStateActions.add(new Pair<LeftRight, Location>(action, newState));
+            visitedStateActions.add(new Pair<LeftRight, Location>(action, oldState));
         }
 
         // Update the Q
@@ -82,13 +81,7 @@ public class Hubert extends utils.Hubert {
 
         // n updates using model
         for (int i = 0; i < n; i++) {
-            Pair<LeftRight, Location> randomActionState = visitedStateActions.get(random.nextInt(visitedStateActions.size()));
-            Location s = randomActionState.getB();
-            LeftRight a = randomActionState.getA();
-            Pair<Integer, Location> rewardState = model[s.y][s.x][a.getValue()];
-            int r = rewardState.getA();
-            Location sPrime = rewardState.getB();
-            updateQSA(s, a, r, sPrime);
+            dynaQUpdate();
         }
 
         return newState;
@@ -102,18 +95,20 @@ public class Hubert extends utils.Hubert {
      * @param newState S' in the above formula
      */
     private void updateQSA(Location oldState, LeftRight action, int reward, Location newState) {
-        actionValue[oldState.y][oldState.y][action.getValue()] += alpha*(reward +
+        actionValue[oldState.y][oldState.x][action.getValue()] += alpha*(reward +
                 lam*actionValue[newState.y][newState.x][getMaxAction(newState).getValue()]
-                - actionValue[oldState.y][oldState.y][action.getValue()]);
+                - actionValue[oldState.y][oldState.x][action.getValue()]);
     }
 
     /**
-     *
+     * Returns the max action value, if equal returns a random one.
      * @param state Sate s, location x, y
      * @return max a, the best action gives State s
      */
     private LeftRight getMaxAction(Location state) {
-        return actionValue[state.y][state.x][0] > actionValue[state.y][state.x][1] ? LeftRight.LEFT : LeftRight.RIGHT;
+        return actionValue[state.y][state.x][0] > actionValue[state.y][state.x][1] ? LeftRight.LEFT :
+                actionValue[state.y][state.x][0] == actionValue[state.y][state.x][1] ?
+                        random.nextInt(2) == 0 ? LeftRight.LEFT : LeftRight.RIGHT : LeftRight.RIGHT;
     }
 
     /**
@@ -187,6 +182,28 @@ public class Hubert extends utils.Hubert {
     private void addWind() {
         velocity.setvWindHor(windHor[getY()][getX()]);
         velocity.setvWindVert(windVert[getY()][getX()]);
+    }
+
+    public void modelFormerPath(ArrayList<Sars<Location, LeftRight, Integer>> formerPath){
+        for (Sars<Location, LeftRight, Integer> sars: formerPath){
+            Location state = sars.getState();
+            Location newSate = sars.getNewState();
+            LeftRight action = sars.getAction();
+            int reward = sars.getReward();
+            model[state.y][state.x][action.getValue()] = new Pair<>(reward, newSate);
+            visitedStateActions.add(new Pair<>(action, state));
+            updateQSA(state, action, reward, newSate);
+        }
+    }
+
+    private void dynaQUpdate() {
+        Pair<LeftRight, Location> randomActionState = visitedStateActions.get(random.nextInt(visitedStateActions.size()));
+        Location s = randomActionState.getB();
+        LeftRight a = randomActionState.getA();
+        Pair<Integer, Location> rewardState = model[s.y][s.x][a.getValue()];
+        int r = rewardState.getA();
+        Location sPrime = rewardState.getB();
+        updateQSA(s, a, r, sPrime);
     }
 
 }
