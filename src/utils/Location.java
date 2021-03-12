@@ -1,5 +1,8 @@
 package utils;
 
+/**
+ * Container for a x and y, and possibility for a action value.
+ */
 public class Location implements Comparable{
     public int x, y;
     public int move;

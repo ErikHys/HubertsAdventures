@@ -31,7 +31,7 @@ public class ReadAndWrite {
     public static void writePath(ArrayList<Location> path, String name) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(name));
         for (Location l: path){
-            writer.write(l.x + " " + l.y + "\n");
+            writer.write("paths/" + l.x + " " + l.y + "\n");
         }
         writer.close();
     }
