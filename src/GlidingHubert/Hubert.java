@@ -2,7 +2,7 @@ package GlidingHubert;
 
 import utils.Location;
 import utils.Pair;
-import utils.ReadAndWrite;
+
 import utils.Sars;
 import java.util.ArrayList;
 
@@ -116,7 +116,7 @@ public class Hubert extends utils.Hubert {
      * @param action Left or Right
      * @return New location of Hubert
      */
-    private Location doAction(LeftRight action){
+    public Location doAction(LeftRight action){
         switch (action){
             case LEFT -> velocity.setvAirHor(-3);
             case RIGHT -> velocity.setvAirHor(3);
@@ -135,7 +135,7 @@ public class Hubert extends utils.Hubert {
         if(checkPath(newX, newY)){
             return move(newX, newY);
         }else {
-            return move(13, 5);
+            return move(5, 13);
         }
     }
 
@@ -206,4 +206,8 @@ public class Hubert extends utils.Hubert {
         updateQSA(s, a, r, sPrime);
     }
 
+
+    public double[][][] getActionValue() {
+        return actionValue;
+    }
 }

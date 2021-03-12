@@ -1,6 +1,9 @@
 package GlidingHubert;
 
 import utils.Location;
+import utils.ReadAndWrite;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class RunSimulation {
@@ -16,8 +19,11 @@ public class RunSimulation {
      */
     public static ArrayList<Location> runSmartSimulation(Hubert hubert, double epsilon, int n, int dynaQSteps, double lam, double alpha){
         ArrayList<Location> path = null;
+        int[] nrOfSteps = new int[n];
+        int time = 0;
         for (int ep = 0; ep < n; ep++) {
             path = new ArrayList<>();
+
             int steps = 0;
             while (!hubert.finished(54, 14) && steps < 100000){
                 path.add(hubert.dynaQ(epsilon, dynaQSteps));
@@ -25,9 +31,12 @@ public class RunSimulation {
             }
 
 //            System.out.println("DynaQSteps: " + dynaQSteps + " " + " length: " + path.size() + " " + (ep+1) + "/" + n);
-
-            if(ep == n-1)System.out.println("Length: " + path.size() + " DynaQSteps: " + dynaQSteps +
-                    " epsilon: " + epsilon + " lambda: " + lam + " alpha: " + alpha + " length: " + path.size() + " " + (ep+1) + "/" + n);
+            time += steps;
+            nrOfSteps[ep] = steps;
+            if(ep == n-1){
+                System.out.println("Length: " + path.size() + " DynaQSteps: " + dynaQSteps +
+                        " epsilon: " + epsilon + " lambda: " + lam + " alpha: " + alpha + " length: " + path.size() + " " + (ep+1) + "/" + n);
+            }
             hubert.reset(5, 13);
 
         }

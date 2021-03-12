@@ -64,4 +64,16 @@ public class ReadAndWrite {
         }
         return txtPath;
     }
+
+    public static void writeModel(double[][][] model) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("paths/model.txt"));
+        for (double[][] rows: model){
+            for (double[] cols: rows){
+                writer.write((cols[0] + cols[1]) + " ");
+            }
+            writer.write("\n");
+        }
+        writer.close();
+
+    }
 }
