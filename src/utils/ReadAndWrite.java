@@ -6,6 +6,12 @@ import java.util.Scanner;
 
 public class ReadAndWrite {
 
+    /**
+     * Read a 2 dim grid from file, of ints
+     * @param fileName
+     * @return 2 dim int grid
+     * @throws FileNotFoundException    Check if you specified directory
+     */
     public static int[][] getGrid(String fileName) throws FileNotFoundException {
         File file = new File(fileName);
         Scanner sc = new Scanner(file);
@@ -28,6 +34,12 @@ public class ReadAndWrite {
         return grid;
     }
 
+    /**
+     * Write a path to a txt file
+     * @param path Path of locations containing x, y
+     * @param name Name of path
+     * @throws IOException
+     */
     public static void writePath(ArrayList<Location> path, String name) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(name));
         for (Location l: path){
