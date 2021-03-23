@@ -1,9 +1,6 @@
 package GlidingHubert;
 
 import utils.Location;
-import utils.ReadAndWrite;
-
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class RunSimulation {
@@ -30,7 +27,6 @@ public class RunSimulation {
                 steps++;
             }
 
-//            System.out.println("DynaQSteps: " + dynaQSteps + " " + " length: " + path.size() + " " + (ep+1) + "/" + n);
             time += steps;
             nrOfSteps[ep] = steps;
             if(ep == n-1){
