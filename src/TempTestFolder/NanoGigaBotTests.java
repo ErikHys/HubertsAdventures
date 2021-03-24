@@ -50,4 +50,12 @@ public class NanoGigaBotTests {
         NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(0.0, 0.0), new Vector2D(1.0, 0.0));
         assertEquals(nanoGiga5000.whenCollide(circle), 11, 0.0);
     }
+
+    @Test
+    public void changeAngle90Test(){
+        NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(0.0, 0.0), new Vector2D(1.0, 0.0));
+        nanoGiga5000.changeDir(Math.PI/2.0);
+        assertEquals(nanoGiga5000.getVectorVelocity().y(), 1, 0.00001);
+        assertEquals(nanoGiga5000.getVectorVelocity().x(), 0, 0.00001);
+    }
 }

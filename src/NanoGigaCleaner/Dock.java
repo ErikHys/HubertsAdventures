@@ -2,13 +2,12 @@ package NanoGigaCleaner;
 
 import utils.Vector2D;
 
-public class Circle  implements ISofaClubObject {
-
+public class Dock implements ISofaClubObject {
     private Vector2D vector;
     private static final double VELOCITY = 0.0;
     private static final double RADIUS = 1.0;
 
-    public Circle(Vector2D v){
+    public Dock(Vector2D v){
         vector = v;
     }
 

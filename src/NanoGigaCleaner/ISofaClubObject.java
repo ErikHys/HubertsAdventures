@@ -2,7 +2,7 @@ package NanoGigaCleaner;
 
 import utils.Vector2D;
 
-public interface SofaClubObject {
+public interface ISofaClubObject {
 
 
     void setVector(Vector2D u);
