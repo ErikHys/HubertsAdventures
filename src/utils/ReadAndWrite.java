@@ -50,6 +50,16 @@ public class ReadAndWrite {
         writer.close();
     }
 
+    /**
+     * Write a path to a txt file, bad implementation because I didn't implement inheritance for vector and location
+     */
+    public static void writePath(Vector2D[] path, String name) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("paths/" + name));
+        for (Vector2D l: path){
+            writer.write(l.x() + " " + l.y() + "\n");
+        }
+        writer.close();
+    }
     public static ArrayList<Sars<Location, LeftRight, Integer>> readSarsPath(String fileName) throws FileNotFoundException {
         File file = new File(fileName);
         Scanner sc = new Scanner(file);

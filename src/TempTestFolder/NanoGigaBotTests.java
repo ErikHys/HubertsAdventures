@@ -48,7 +48,21 @@ public class NanoGigaBotTests {
     public void timeTestOne(){
         Circle circle = new Circle(new Vector2D(11.0, 0.0));
         NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(0.0, 0.0), new Vector2D(1.0, 0.0));
-        assertEquals(nanoGiga5000.whenCollide(circle), 11, 0.0);
+        assertEquals(nanoGiga5000.whenCollide(circle).getA(), 11.0, 0.0);
+    }
+
+    @Test
+    public void timeTestExpectedCrashPosition(){
+        Circle circle = new Circle(new Vector2D(11.0, 0.0));
+        NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(0.0, 0.0), new Vector2D(1.0, 0.0));
+        assertEquals(nanoGiga5000.whenCollide(circle).getB().x(), 10.0, 0.0);
+    }
+
+    @Test
+    public void timeTestExpectedCrashPositionNegativeValues(){
+        Circle circle = new Circle(new Vector2D(0.0, 0.0));
+        NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(11.0, 0.0), new Vector2D(-1.0, 0.0));
+        assertEquals(nanoGiga5000.whenCollide(circle).getB().x(), 1.0, 0.0);
     }
 
     @Test
