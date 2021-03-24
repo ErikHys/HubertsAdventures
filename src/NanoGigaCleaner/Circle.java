@@ -2,8 +2,33 @@ package NanoGigaCleaner;
 
 import utils.Vector2D;
 
-public class Circle {
+public class Circle  implements SofaClubObject{
 
-    private Vector2D vec;
-    private static final double VELOCITY = 0;
+    private Vector2D vector;
+    private static final double VELOCITY = 0.0;
+    private static final double RADIUS = 1.0;
+
+    public Circle(Vector2D v){
+        vector = v;
+    }
+
+    @Override
+    public void setVector(Vector2D u) {
+        vector = u;
+    }
+
+    @Override
+    public Vector2D getVector() {
+        return vector;
+    }
+
+    @Override
+    public double getVelocity() {
+        return VELOCITY;
+    }
+
+    @Override
+    public double getRadius() {
+        return RADIUS;
+    }
 }
