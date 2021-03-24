@@ -103,6 +103,7 @@ public class NanoGigaBotTests {
         assertNotEquals(prevVelDir, newVelDir);
         assertNotEquals(prevVelDir.x(), newVelDir.x());
         assertNotEquals(prevVelDir.y(), newVelDir.y());
+        System.out.println("Change direction test: ");
         System.out.println("Old x: " + prevVelDir.x() + " new x: " + newVelDir.x());
         System.out.println("Old y: " + prevVelDir.y() + " new y: " + newVelDir.y());
     }
@@ -121,8 +122,19 @@ public class NanoGigaBotTests {
         assertNotEquals(prevVelDir.x(), newVelDir.x());
         assertNotEquals(prevVelDir.y(), newVelDir.y());
         double totalVelocity = Math.pow(nanoGiga5000.getVectorVelocity().x(), 2) + Math.pow(nanoGiga5000.getVectorVelocity().y(), 2);
-        assertEquals(totalVelocity, 1, 0.0001);
+        assertEquals(totalVelocity, 1.0, 0.0001);
     }
+
+    @Test
+    public void boundariesTest(){
+        ISofaClubObject[] circles = setUpSimpleCircles();
+        NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(2, 2), new Vector2D(0, -1), circles);
+        Pair<Double, Vector2D> p = nanoGiga5000.doRandomAction();
+        assertEquals(p.getA(), 2.0, 0.0);
+        assertEquals(p.getB().y(), 0.0, 0.0);
+    }
+
+
     private ISofaClubObject[] setUpSimpleCircles() {
         ISofaClubObject[] circles = new ISofaClubObject[5];
         circles[0] = new Circle(new Vector2D(11, 11));

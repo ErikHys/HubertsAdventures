@@ -94,9 +94,21 @@ public class NanoGiga5000 implements ISofaClubObject {
                 futureCollisions.add(collisionTimeLocation);
             }
         }
-        futureCollisions.sort(Comparator.comparingDouble(Pair::getA));
-        vector = futureCollisions.get(0).getB();
-        double time = futureCollisions.get(0).getA();
+        double time = 0;
+        Pair<Double, Vector2D> rewardState;
+        if(futureCollisions.size() > 0){
+            futureCollisions.sort(Comparator.comparingDouble(Pair::getA));
+            rewardState = futureCollisions.get(0);
+            vector = futureCollisions.get(0).getB();
+            time = futureCollisions.get(0).getA();
+        }else {
+            rewardState = hitWall();
+            vector = rewardState.getB();
+            time = rewardState.getA();
+            double action = random.nextDouble() * 2 * Math.PI;
+            changeDir(action);
+        }
+
         if(collisions(clubObjects)){
             if(collision(dock)) return null;
             double action = random.nextDouble() * 2 * Math.PI;
@@ -104,7 +116,19 @@ public class NanoGiga5000 implements ISofaClubObject {
             time += 1;
             return new Pair<>(time, vector);
         }
-        return futureCollisions.get(0);
+        return rewardState;
+    }
+
+    private Pair<Double, Vector2D> hitWall() {
+        //TODO IMPLEMENT NICER
+        double timeXU = (13 - vector.x())/vectorVelocity.x();
+        double timeYU = (13 - vector.y())/vectorVelocity.y();
+        double timeXL = (0 - vector.x())/vectorVelocity.x();
+        double timeYL = (0 - vector.y())/vectorVelocity.y();
+        double timeU = Math.min(Math.abs(timeXU), Math.abs(timeYU));
+        double timeL = Math.min(Math.abs(timeXL), Math.abs(timeYL));
+        double time = Math.min(Math.abs(timeU), Math.abs(timeL));
+        return new Pair<>(time, vector.add(vectorVelocity.mul(time)));
     }
 
 
