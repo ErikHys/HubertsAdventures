@@ -6,10 +6,15 @@ public class Circle  implements ISofaClubObject {
 
     private Vector2D vector;
     private static final double VELOCITY = 0.0;
-    private static final double RADIUS = 1.0;
+    private double RADIUS = 1.0;
 
     public Circle(Vector2D v){
         vector = v;
+    }
+
+    public Circle(Vector2D v, double radius){
+        vector = v;
+        RADIUS = radius;
     }
 
     @Override
@@ -31,4 +36,5 @@ public class Circle  implements ISofaClubObject {
     public double getRadius() {
         return RADIUS;
     }
+
 }

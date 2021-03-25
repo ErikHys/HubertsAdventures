@@ -1,4 +1,4 @@
-package TempTestFolder;
+package Tests;
 
 import NanoGigaCleaner.Circle;
 import NanoGigaCleaner.ISofaClubObject;
@@ -85,42 +85,6 @@ public class NanoGigaBotTests {
 
     @Test
     public void finishedTest(){
-        ISofaClubObject[] circles = setUpSimpleCircles();
-        NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(11, 9.5), new Vector2D(0, 1), circles);
-        Pair<Double, Vector2D> p = nanoGiga5000.doRandomAction();
-        assertEquals(p.getB().x(), 11, 0.0);
-        assertEquals(p.getB().y(), 11, 0.0);
-    }
-
-    @Test
-    public void finishedTest1(){
-        ISofaClubObject[] circles = setUpSimpleCircles();
-        NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(11, 9.5), new Vector2D(0, 1), circles);
-        Pair<Double, Vector2D> p = nanoGiga5000.doRandomAction();
-        assertEquals(p.getB().x(), 11, 0.0);
-        assertEquals(p.getB().y(), 11, 0.0);
-    }
-
-    @Test
-    public void finishedTest2(){
-        ISofaClubObject[] circles = setUpSimpleCircles();
-        NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(11, 9.5), new Vector2D(0, 1), circles);
-        Pair<Double, Vector2D> p = nanoGiga5000.doRandomAction();
-        assertEquals(p.getB().x(), 11, 0.0);
-        assertEquals(p.getB().y(), 11, 0.0);
-    }
-
-    @Test
-    public void finishedTest3(){
-        ISofaClubObject[] circles = setUpSimpleCircles();
-        NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(11, 9.5), new Vector2D(0, 1), circles);
-        Pair<Double, Vector2D> p = nanoGiga5000.doRandomAction();
-        assertEquals(p.getB().x(), 11, 0.0);
-        assertEquals(p.getB().y(), 11, 0.0);
-    }
-
-    @Test
-    public void finishedTest4(){
         ISofaClubObject[] circles = setUpSimpleCircles();
         NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(11, 9.5), new Vector2D(0, 1), circles);
         Pair<Double, Vector2D> p = nanoGiga5000.doRandomAction();

@@ -7,6 +7,7 @@ import utils.Vector2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class MonteCarloApproximation {
 
@@ -17,28 +18,34 @@ public class MonteCarloApproximation {
         ArrayList<Pair<Double, Vector2D>> path = null;
         int i = 0;
         double avg = 0;
-        for (int j = 0; j < 10000; j++) {
+        LinearCombination w = new LinearCombination(4, 0.01);
+        for (int j = 0; j < 100; j++) {
             path = new ArrayList<>();
             NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(2, 2), new Vector2D(1, 0), clubObjects);
-            while (i < 10000){
+            while (i < 100){
                 Pair<Double, Vector2D> currentRewardState = nanoGiga5000.doRandomAction();
-                if (currentRewardState.getB().x() == 11 && currentRewardState.getB().y() == 11) break;
                 path.add(currentRewardState);
                 i++;
+                if (currentRewardState.getB().x() == 11 && currentRewardState.getB().y() == 11) break;
             }
-            avg += i/(double)10000;
+            Vector2D[] vectorPath = new Vector2D[path.size()];
+            ArrayList<Pair<Double, Vector2D>> finalPath = path;
+//            Arrays.setAll(vectorPath, a -> finalPath.get(a).getB());
+//            ReadAndWrite.writePath(vectorPath, "../paths/NanoGigaVIZ" + j + ".txt");
+            avg += nanoGiga5000.getTotalTime()/(double)100;
+            for (int s = 0, e = path.size()-1; s < path.size(); s++, e--) {
+//                w.updateWeights();
+            }
             i = 0;
         }
         System.out.println(avg);
-//        System.out.println(path.size());
-        Vector2D[] vectorPath = new Vector2D[path.size()];
-        ArrayList<Pair<Double, Vector2D>> finalPath = path;
-        Arrays.setAll(vectorPath, a -> finalPath.get(a).getB());
-        ReadAndWrite.writePath(vectorPath, "../paths/NanoGigaVIZ.txt");
+
+
 
     }
 
     public static ISofaClubObject[] clubObjectsSetUp(){
+        double r = 100;
         ISofaClubObject[] circles = new ISofaClubObject[11];
         circles[0] = new Dock(new Vector2D(11, 11));
         circles[1] = new Circle(new Vector2D(5, 5));

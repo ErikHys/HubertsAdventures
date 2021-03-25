@@ -1,4 +1,4 @@
-package TempTestFolder;
+package Tests;
 
 import NanoGigaCleaner.LinearCombination;
 import org.junit.Test;

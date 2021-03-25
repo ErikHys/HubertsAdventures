@@ -55,94 +55,96 @@ public class NanoGiga5000 implements ISofaClubObject {
         return vectorVelocity;
     }
 
-    public boolean collisions(ISofaClubObject[] circles){
-        // Out of bounds
-        if(vector.x() >= 13 || vector.x() < 0 || vector.y() >= 13 || vector.y() < 0) return true;
-
-        // Crash with circle
-        for (ISofaClubObject circle: circles){
-            if (collision(circle)) return true;
-        }
-        return false;
-    }
 
     public boolean collision(ISofaClubObject circle) {
         Vector2D vectorPosSub = this.vector.sub(circle.getVector());
-        return vectorPosSub.mul(vectorPosSub) <= 1;
+        return vectorPosSub.mul(vectorPosSub) <= 1.1;
+    }
+
+
+    public double getTotalTime() {
+        return totalTime;
     }
 
     public Pair<Double, Vector2D> whenCollide(ISofaClubObject circle){
+        //TODO FIX, walls and clipping
+
         double a = vectorVelocity.mul(vectorVelocity);
         Vector2D vectorPosSub = this.vector.sub(circle.getVector());
         double b = vectorVelocity.mul(vectorPosSub);
-        double d = b * b - a * vectorPosSub.mul(vectorPosSub);
+        double d = b * b - a * (vectorPosSub.mul(vectorPosSub) - Math.pow(circle.getRadius(), 2.0));
         // Set time to  negative value to know if they collide
         double time = -1.0;
         if (d >= 0){
-            time = (-b - Math.sqrt(d))/a;
+            double t0 = (-b - Math.sqrt(d));
+            double t1 = (-b + Math.sqrt(d));
+
+            time = (-b - Math.sqrt(d)) >= 0 ? (-b - Math.sqrt(d)) : -1;
+            if (((-b - Math.sqrt(d)) > (-b + Math.sqrt(d)) && (-b + Math.sqrt(d)) > 0) || ((-b - Math.sqrt(d)) < 0 && (-b + Math.sqrt(d)) > 0)){
+                time = (-b + Math.sqrt(d));
+            }
+            time = time > 0.00001 ? time - 0.000001 : time;
         }
-        // -1 for radius of circle
-        time = time-circle.getRadius();
-        Vector2D t = vector.add(vectorVelocity.mul(time));
+
         return new Pair<Double, Vector2D>(time, vector.add(vectorVelocity.mul(time)));
     }
+
 
     public Pair<Double, Vector2D> doRandomAction(){
         ArrayList<Pair<Double, Vector2D>> futureCollisions = new ArrayList<>();
         double time = 0;
-
+        if(collision(dock)) return new Pair<>(totalTime, new Vector2D(11, 11));
+        insideCircle();
         for (ISofaClubObject circle: clubObjects){
             Pair<Double, Vector2D> collisionTimeLocation = whenCollide(circle);
             if (collisionTimeLocation.getA() >= 0){
                 futureCollisions.add(collisionTimeLocation);
             }
         }
-        Pair<Double, Vector2D> rewardState;
-        if(futureCollisions.size() > 0){
-            futureCollisions.sort(Comparator.comparingDouble(Pair::getA));
-            rewardState = futureCollisions.get(0);
-        }else {
-            rewardState = hitWall();
+        futureCollisions.add(hitWall());
+        futureCollisions.sort(Comparator.comparingDouble(Pair::getA));
+        Pair<Double, Vector2D> rewardState = futureCollisions.get(0);
 
-        }
-        //TODO FIX TO propose move
 
-        if(rewardState.getB().x() >= 0 && rewardState.getB().x() <= 13 && rewardState.getB().y() <= 13 && rewardState.getB().y() >= 0){
-            vector = rewardState.getB();
-            time = rewardState.getA();
-        }
+        vector = rewardState.getB();
+        time = rewardState.getA();
+
         double action = getValidDir();
         changeDir(action);
         time += 1;
-        if(collisions(clubObjects)){
-            if(collision(dock)) return new Pair<>(totalTime, new Vector2D(11, 11));
-            totalTime += time;
-            return new Pair<>(time, vector);
-        }
+
         totalTime += time;
-        return new Pair<>(time, vector);
+        return new Pair<>(totalTime, vector);
     }
 
+    private void insideCircle(){
+        //Move just outside circle
+        for(ISofaClubObject clubObject: clubObjects){
+            if(collision(clubObject)){
+                vector = clubObject.getVector().add(vector.sub(clubObject.getVector()).mul(clubObject.getRadius()*1.1));
+            }
+        }
+
+    }
     private double getValidDir() {
         return random.nextDouble() * 2 * Math.PI;
     }
 
-    private Pair<Double, Vector2D> hitWall() {
-        //TODO IMPLEMENT NICER
-        double timeXU = Math.abs((13 - vector.x())/vectorVelocity.x()) > 0 ? Math.abs((13 - vector.x())/vectorVelocity.x()) : Double.MAX_VALUE;
-        double timeYU = Math.abs((13 - vector.y())/vectorVelocity.y()) > 0 ? Math.abs((13 - vector.y())/vectorVelocity.y()) : Double.MAX_VALUE;
-        double timeXL = Math.abs((0 - vector.x())/vectorVelocity.x()) > 0 ? Math.abs((0 - vector.x())/vectorVelocity.x()) : Double.MAX_VALUE;
-        double timeYL = Math.abs((0 - vector.y())/vectorVelocity.y()) > 0 ? Math.abs((0 - vector.y())/vectorVelocity.y()) : Double.MAX_VALUE;
-        double timeU = Math.min(timeXU, timeYU);
-        double timeL = Math.min(timeXL, timeYL);
-        double time = Math.min(timeU, timeL);
-        Vector2D v = vector.add(vectorVelocity.mul(time));
-        return new Pair<>(time, v);
+    public void changeDir(double rad){
+        vectorVelocity = vectorVelocity.rotate(rad);
     }
 
 
-    public void changeDir(double rad){
-        //Change dir not hit wall
-        vectorVelocity = vectorVelocity.rotate(rad);
+    private Pair<Double, Vector2D> hitWall() {
+        //TODO IMPLEMENT NICER/DELETE
+        double timeXU = (13 - vector.x())/vectorVelocity.x() > 0 ? Math.abs((13 - vector.x())/vectorVelocity.x()) : 13*13;
+        double timeYU = (13 - vector.y())/vectorVelocity.y() > 0 ? Math.abs((13 - vector.y())/vectorVelocity.y()) : 13*13;
+        double timeXL = (0 - vector.x())/vectorVelocity.x() > 0 ? Math.abs((0 - vector.x())/vectorVelocity.x()) : 13*13;
+        double timeYL = (0 - vector.y())/vectorVelocity.y() > 0 ? Math.abs((0 - vector.y())/vectorVelocity.y()) : 13*13;
+        double timeU = Math.min(timeXU, timeYU);
+        double timeL = Math.min(timeXL, timeYL);
+        double time = Math.min(timeU, timeL) - 0.000001;
+        Vector2D v = vector.add(vectorVelocity.mul(time));
+        return new Pair<>(time, v);
     }
 }
