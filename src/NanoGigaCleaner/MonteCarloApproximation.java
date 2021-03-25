@@ -13,18 +13,27 @@ public class MonteCarloApproximation {
     // FUN FUN FUN :)
     public static void main(String[] args) throws IOException {
         ISofaClubObject[] clubObjects = clubObjectsSetUp();
-        NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(2, 2), new Vector2D(1, 0), clubObjects);
-        ArrayList<Pair<Double, Vector2D>> path = new ArrayList<>();
+
+        ArrayList<Pair<Double, Vector2D>> path = null;
         int i = 0;
-        while (i < 100000){
-            Pair<Double, Vector2D> currentRewardState = nanoGiga5000.doRandomAction();
-            if (currentRewardState == null) break;
-            path.add(currentRewardState);
-            i++;
+        double avg = 0;
+        for (int j = 0; j < 10000; j++) {
+            path = new ArrayList<>();
+            NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(2, 2), new Vector2D(1, 0), clubObjects);
+            while (i < 10000){
+                Pair<Double, Vector2D> currentRewardState = nanoGiga5000.doRandomAction();
+                if (currentRewardState.getB().x() == 11 && currentRewardState.getB().y() == 11) break;
+                path.add(currentRewardState);
+                i++;
+            }
+            avg += i/(double)10000;
+            i = 0;
         }
-        System.out.println(path.size());
+        System.out.println(avg);
+//        System.out.println(path.size());
         Vector2D[] vectorPath = new Vector2D[path.size()];
-        Arrays.setAll(vectorPath, a -> path.get(a).getB());
+        ArrayList<Pair<Double, Vector2D>> finalPath = path;
+        Arrays.setAll(vectorPath, a -> finalPath.get(a).getB());
         ReadAndWrite.writePath(vectorPath, "../paths/NanoGigaVIZ.txt");
 
     }

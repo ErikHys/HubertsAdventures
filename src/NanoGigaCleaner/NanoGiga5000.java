@@ -14,6 +14,7 @@ public class NanoGiga5000 implements ISofaClubObject {
     private Vector2D vectorVelocity;
     private static final double VELOCITY = 1.0;
     private static final double RADIUS = 0.0;
+    private double totalTime = 0;
     private final Random random;
     private ISofaClubObject[] clubObjects = null;
 
@@ -88,51 +89,60 @@ public class NanoGiga5000 implements ISofaClubObject {
 
     public Pair<Double, Vector2D> doRandomAction(){
         ArrayList<Pair<Double, Vector2D>> futureCollisions = new ArrayList<>();
+        double time = 0;
+
         for (ISofaClubObject circle: clubObjects){
             Pair<Double, Vector2D> collisionTimeLocation = whenCollide(circle);
             if (collisionTimeLocation.getA() >= 0){
                 futureCollisions.add(collisionTimeLocation);
             }
         }
-        double time = 0;
         Pair<Double, Vector2D> rewardState;
         if(futureCollisions.size() > 0){
             futureCollisions.sort(Comparator.comparingDouble(Pair::getA));
             rewardState = futureCollisions.get(0);
-            vector = futureCollisions.get(0).getB();
-            time = futureCollisions.get(0).getA();
         }else {
             rewardState = hitWall();
+
+        }
+        //TODO FIX TO propose move
+
+        if(rewardState.getB().x() >= 0 && rewardState.getB().x() <= 13 && rewardState.getB().y() <= 13 && rewardState.getB().y() >= 0){
             vector = rewardState.getB();
             time = rewardState.getA();
-            double action = random.nextDouble() * 2 * Math.PI;
-            changeDir(action);
         }
-
+        double action = getValidDir();
+        changeDir(action);
+        time += 1;
         if(collisions(clubObjects)){
-            if(collision(dock)) return null;
-            double action = random.nextDouble() * 2 * Math.PI;
-            changeDir(action);
-            time += 1;
+            if(collision(dock)) return new Pair<>(totalTime, new Vector2D(11, 11));
+            totalTime += time;
             return new Pair<>(time, vector);
         }
-        return rewardState;
+        totalTime += time;
+        return new Pair<>(time, vector);
+    }
+
+    private double getValidDir() {
+        return random.nextDouble() * 2 * Math.PI;
     }
 
     private Pair<Double, Vector2D> hitWall() {
         //TODO IMPLEMENT NICER
-        double timeXU = (13 - vector.x())/vectorVelocity.x();
-        double timeYU = (13 - vector.y())/vectorVelocity.y();
-        double timeXL = (0 - vector.x())/vectorVelocity.x();
-        double timeYL = (0 - vector.y())/vectorVelocity.y();
-        double timeU = Math.min(Math.abs(timeXU), Math.abs(timeYU));
-        double timeL = Math.min(Math.abs(timeXL), Math.abs(timeYL));
-        double time = Math.min(Math.abs(timeU), Math.abs(timeL));
-        return new Pair<>(time, vector.add(vectorVelocity.mul(time)));
+        double timeXU = Math.abs((13 - vector.x())/vectorVelocity.x()) > 0 ? Math.abs((13 - vector.x())/vectorVelocity.x()) : Double.MAX_VALUE;
+        double timeYU = Math.abs((13 - vector.y())/vectorVelocity.y()) > 0 ? Math.abs((13 - vector.y())/vectorVelocity.y()) : Double.MAX_VALUE;
+        double timeXL = Math.abs((0 - vector.x())/vectorVelocity.x()) > 0 ? Math.abs((0 - vector.x())/vectorVelocity.x()) : Double.MAX_VALUE;
+        double timeYL = Math.abs((0 - vector.y())/vectorVelocity.y()) > 0 ? Math.abs((0 - vector.y())/vectorVelocity.y()) : Double.MAX_VALUE;
+        double timeU = Math.min(timeXU, timeYU);
+        double timeL = Math.min(timeXL, timeYL);
+        double time = Math.min(timeU, timeL);
+        Vector2D v = vector.add(vectorVelocity.mul(time));
+        return new Pair<>(time, v);
     }
 
 
     public void changeDir(double rad){
+        //Change dir not hit wall
         vectorVelocity = vectorVelocity.rotate(rad);
     }
 }
