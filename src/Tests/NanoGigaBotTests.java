@@ -50,21 +50,21 @@ public class NanoGigaBotTests {
     public void timeTestOne(){
         Circle circle = new Circle(new Vector2D(11.0, 0.0));
         NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(0.0, 0.0), new Vector2D(1.0, 0.0));
-        assertEquals(nanoGiga5000.whenCollide(circle).getA(), 10.0, 0.0);
+        assertEquals(nanoGiga5000.whenCollide(circle).getA(), 10.0, 0.001);
     }
 
     @Test
     public void timeTestExpectedCrashPosition(){
         Circle circle = new Circle(new Vector2D(11.0, 0.0));
         NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(0.0, 0.0), new Vector2D(1.0, 0.0));
-        assertEquals(nanoGiga5000.whenCollide(circle).getB().x(), 10.0, 0.0);
+        assertEquals(nanoGiga5000.whenCollide(circle).getB().x(), 10.0, 0.0001);
     }
 
     @Test
     public void timeTestExpectedCrashPositionNegativeValues(){
         Circle circle = new Circle(new Vector2D(0.0, 0.0));
         NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(11.0, 0.0), new Vector2D(-1.0, 0.0));
-        assertEquals(nanoGiga5000.whenCollide(circle).getB().x(), 1.0, 0.0);
+        assertEquals(nanoGiga5000.whenCollide(circle).getB().x(), 1.0, 0.0001);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class NanoGigaBotTests {
     public void testDoAction(){
         ISofaClubObject[] circles = setUpSimpleCircles();
         NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(2, 2), new Vector2D(0, 1), circles);
-        Pair<Double, Vector2D> p = nanoGiga5000.doRandomAction();
+        Pair<Double, Pair<Vector2D, Vector2D>> p = nanoGiga5000.doRandomAction();
         assertEquals(p.getA(), 7.0, 0.00001);
     }
 
@@ -87,9 +87,9 @@ public class NanoGigaBotTests {
     public void finishedTest(){
         ISofaClubObject[] circles = setUpSimpleCircles();
         NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(11, 9.5), new Vector2D(0, 1), circles);
-        Pair<Double, Vector2D> p = nanoGiga5000.doRandomAction();
-        assertEquals(p.getB().x(), 11, 0.0);
-        assertEquals(p.getB().y(), 11, 0.0);
+        Pair<Double, Pair<Vector2D, Vector2D>> p = nanoGiga5000.doRandomAction();
+        assertEquals(p.getB().getA().x(), 11, 0.0);
+        assertEquals(p.getB().getA().y(), 10, 0.0001);
     }
 
 
@@ -98,7 +98,7 @@ public class NanoGigaBotTests {
         ISofaClubObject[] circles = setUpSimpleCircles();
         NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(2, 2), new Vector2D(0, 1), circles);
         Vector2D prevVelDir = nanoGiga5000.getVectorVelocity();
-        Pair<Double, Vector2D> p = nanoGiga5000.doRandomAction();
+        Pair<Double, Pair<Vector2D, Vector2D>> p = nanoGiga5000.doRandomAction();
         assertEquals(p.getA(), 7.0, 0.00001);
         Vector2D newVelDir = nanoGiga5000.getVectorVelocity();
         //Might fail if random chooses same dir somehow
@@ -116,7 +116,7 @@ public class NanoGigaBotTests {
         ISofaClubObject[] circles = setUpSimpleCircles();
         NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(2, 2), new Vector2D(0, 1), circles);
         Vector2D prevVelDir = nanoGiga5000.getVectorVelocity();
-        Pair<Double, Vector2D> p = nanoGiga5000.doRandomAction();
+        Pair<Double, Pair<Vector2D, Vector2D>> p = nanoGiga5000.doRandomAction();
         assertEquals(p.getA(), 7.0, 0.00001);
         Vector2D newVelDir = nanoGiga5000.getVectorVelocity();
         //Might fail if random chooses same dir somehow
@@ -131,9 +131,9 @@ public class NanoGigaBotTests {
     public void boundariesTest(){
         ISofaClubObject[] circles = setUpSimpleCircles();
         NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(2, 2), new Vector2D(0, -1), circles);
-        Pair<Double, Vector2D> p = nanoGiga5000.doRandomAction();
-        assertEquals(p.getA(), 3.0, 0.0);
-        assertEquals(p.getB().y(), 0.0, 0.0);
+        Pair<Double, Pair<Vector2D, Vector2D>> p = nanoGiga5000.doRandomAction();
+        assertEquals(p.getA(), 3.0, 0.001);
+        assertEquals(p.getB().getA().y(), 0.0, 0.0001);
     }
 
 

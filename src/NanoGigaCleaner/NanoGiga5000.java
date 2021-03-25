@@ -67,7 +67,6 @@ public class NanoGiga5000 implements ISofaClubObject {
     }
 
     public Pair<Double, Vector2D> whenCollide(ISofaClubObject circle){
-        //TODO FIX, walls and clipping
 
         double a = vectorVelocity.mul(vectorVelocity);
         Vector2D vectorPosSub = this.vector.sub(circle.getVector());
@@ -90,10 +89,10 @@ public class NanoGiga5000 implements ISofaClubObject {
     }
 
 
-    public Pair<Double, Vector2D> doRandomAction(){
+    public Pair<Double, Pair<Vector2D, Vector2D>> doRandomAction(){
         ArrayList<Pair<Double, Vector2D>> futureCollisions = new ArrayList<>();
         double time = 0;
-        if(collision(dock)) return new Pair<>(totalTime, new Vector2D(11, 11));
+        if(collision(dock)) return new Pair<>(totalTime, new Pair<>(new Vector2D(11, 11), vectorVelocity));
         insideCircle();
         for (ISofaClubObject circle: clubObjects){
             Pair<Double, Vector2D> collisionTimeLocation = whenCollide(circle);
@@ -114,7 +113,7 @@ public class NanoGiga5000 implements ISofaClubObject {
         time += 1;
 
         totalTime += time;
-        return new Pair<>(totalTime, vector);
+        return new Pair<>(totalTime, new Pair<Vector2D, Vector2D>(vector, vectorVelocity));
     }
 
     private void insideCircle(){
@@ -136,7 +135,6 @@ public class NanoGiga5000 implements ISofaClubObject {
 
 
     private Pair<Double, Vector2D> hitWall() {
-        //TODO IMPLEMENT NICER/DELETE
         double timeXU = (13 - vector.x())/vectorVelocity.x() > 0 ? Math.abs((13 - vector.x())/vectorVelocity.x()) : 13*13;
         double timeYU = (13 - vector.y())/vectorVelocity.y() > 0 ? Math.abs((13 - vector.y())/vectorVelocity.y()) : 13*13;
         double timeXL = (0 - vector.x())/vectorVelocity.x() > 0 ? Math.abs((0 - vector.x())/vectorVelocity.x()) : 13*13;

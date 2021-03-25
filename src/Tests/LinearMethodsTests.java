@@ -1,6 +1,7 @@
 package Tests;
 
 import NanoGigaCleaner.LinearCombination;
+import NanoGigaCleaner.PolynomialLinearCombination;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import java.util.Random;
 import static org.junit.Assert.assertEquals;
 
 public class LinearMethodsTests {
+    //These are only testing for overfitting on one case, but I plan to implement more complex tests
 
     @Test
     public void updateWeightsTest(){
@@ -29,5 +31,25 @@ public class LinearMethodsTests {
             System.out.println("Sum of weight[i] * feature[i]: " + linearCombination.sumFeatureWeights(testFeatures) + "\n");
         } while (!(Math.abs(actual - linearCombination.sumFeatureWeights(testFeatures)) < 0.0000001));
         assertEquals(linearCombination.sumFeatureWeights(testFeatures), actual, 0.001);
+    }
+
+    @Test
+    public void updatePloyWeightsTest(){
+        PolynomialLinearCombination linearCombination = new PolynomialLinearCombination(4, 0.1);
+        Random random = new Random();
+        random.setSeed(31);
+        double[] testFeatures = new double[4];
+        Arrays.setAll(testFeatures, i -> random.nextDouble());
+
+        double actual = random.nextDouble();
+        System.out.println("\nTarget: " + actual + "\n");
+
+        do {
+            linearCombination.updateWeights(actual, linearCombination.sumFeatureWeights(testFeatures), testFeatures);
+
+        } while (!(Math.abs(actual - linearCombination.sumFeatureWeights(testFeatures)) < 0.0001));
+        assertEquals(linearCombination.sumFeatureWeights(testFeatures), actual, 0.0001);
+        System.out.println("Sum of weight[i] * feature[i]: " + linearCombination.sumFeatureWeights(testFeatures) + "\n");
+
     }
 }
