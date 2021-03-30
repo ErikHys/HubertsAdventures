@@ -1,10 +1,14 @@
 package NanoGigaCleaner;
 
 import utils.Pair;
+import utils.ReadAndWrite;
+import utils.TrainableApproximators.CoarseCoding;
+import utils.TrainableApproximators.PolynomialLinearCombination;
 import utils.Vector2D;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MonteCarloApproximation {
 
@@ -15,7 +19,7 @@ public class MonteCarloApproximation {
         ArrayList<Pair<Double, Pair<Vector2D, Vector2D>>> path = null;
         int i = 0;
         double avg = 0;
-        PolynomialLinearCombination w = new PolynomialLinearCombination(4, 0.0001);
+        CoarseCoding w = new CoarseCoding(13, 13, 8, 0.1);
         for (int j = 0; j < 100000; j++) {
             path = new ArrayList<>();
             NanoGiga5000 nanoGiga5000 = new NanoGiga5000(new Vector2D(2, 2), new Vector2D(1, 0), clubObjects);
@@ -25,19 +29,24 @@ public class MonteCarloApproximation {
                 i++;
                 if (currentRewardState.getB().getA().x() == 11 && currentRewardState.getB().getA().y() == 11) break;
             }
+            if(j < 5){
+                Vector2D[] p = new Vector2D[path.size()];
+                ArrayList<Pair<Double, Pair<Vector2D, Vector2D>>> finalPath = path;
+                Arrays.setAll(p, f -> finalPath.get(f).getB().getA());
+                ReadAndWrite.writePath(p, "NanoGigaVIZ" + j + ".txt");
+            }
             avg += nanoGiga5000.getTotalTime()/(double)100000;
             for (int e = path.size()-1; e >= 0; e--) {
                 if(path.size() == 100) break;
-                double[] features = new double[4];
-                features[0] = path.get(e).getB().getA().x();
-                features[2] = path.get(e).getB().getA().y();
-                features[1] = path.get(e).getB().getB().x();
-                features[3] = path.get(e).getB().getB().y();
-                w.updateWeights(nanoGiga5000.getTotalTime() - path.get(e).getA(), w.sumFeatureWeights(features),features);
+                Vector2D features = path.get(e).getB().getA();
+                Pair<Double, int[][]> predictedPair = w.predict(features);
+                w.updateWeights(nanoGiga5000.getTotalTime() - path.get(e).getA(), predictedPair.getA(), predictedPair.getB());
             }
             i = 0;
         }
         System.out.println(avg);
+        ReadAndWrite.writeWeights(w.getWeights());
+
 
 
 

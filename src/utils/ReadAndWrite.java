@@ -4,6 +4,8 @@ import GlidingHubert.LeftRight;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class ReadAndWrite {
@@ -85,5 +87,18 @@ public class ReadAndWrite {
         }
         writer.close();
 
+    }
+
+    public static void writeWeights(double[][] weights) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("paths/TDweights.txt"));
+        Collections.reverse(Arrays.asList(weights));
+
+        for (double[] rows: weights){
+            for (double cols: rows){
+                writer.write((-cols) + " ");
+            }
+            writer.write("\n");
+        }
+        writer.close();
     }
 }

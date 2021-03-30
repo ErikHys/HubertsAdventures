@@ -1,4 +1,4 @@
-package NanoGigaCleaner;
+package utils.TrainableApproximators;
 
 import java.util.Arrays;
 import java.util.Random;

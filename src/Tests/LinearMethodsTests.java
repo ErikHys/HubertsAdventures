@@ -1,7 +1,7 @@
 package Tests;
 
-import NanoGigaCleaner.LinearCombination;
-import NanoGigaCleaner.PolynomialLinearCombination;
+import utils.TrainableApproximators.LinearCombination;
+import utils.TrainableApproximators.PolynomialLinearCombination;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -26,11 +26,11 @@ public class LinearMethodsTests {
 
 
         do {
-            System.out.println("Sum of weight[i] * feature[i]: " + linearCombination.sumFeatureWeights(testFeatures) + "\n");
-            linearCombination.updateWeights(actual, linearCombination.sumFeatureWeights(testFeatures), testFeatures);
-            System.out.println("Sum of weight[i] * feature[i]: " + linearCombination.sumFeatureWeights(testFeatures) + "\n");
-        } while (!(Math.abs(actual - linearCombination.sumFeatureWeights(testFeatures)) < 0.0000001));
-        assertEquals(linearCombination.sumFeatureWeights(testFeatures), actual, 0.001);
+            System.out.println("Sum of weight[i] * feature[i]: " + linearCombination.predict(testFeatures) + "\n");
+            linearCombination.updateWeights(actual, linearCombination.predict(testFeatures), testFeatures);
+            System.out.println("Sum of weight[i] * feature[i]: " + linearCombination.predict(testFeatures) + "\n");
+        } while (!(Math.abs(actual - linearCombination.predict(testFeatures)) < 0.0000001));
+        assertEquals(linearCombination.predict(testFeatures), actual, 0.001);
     }
 
     @Test
