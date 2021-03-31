@@ -20,8 +20,8 @@ public class Dense {
         weights = new double[out][in];
         grads = new double[out][in];
         bias = new double[out];
-        Arrays.setAll(weights, i-> random.doubles(in).toArray());
-        bias = random.doubles(out).toArray();
+        Arrays.setAll(weights, i-> random.doubles(in, -0.5, 0.5).toArray());
+        bias = random.doubles(out, -0.25, 0.25).toArray();
         Arrays.setAll(grads, i-> random.doubles(in).toArray());
         biasGrads = random.doubles(out).toArray();
     }

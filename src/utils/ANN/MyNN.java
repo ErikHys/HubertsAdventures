@@ -8,6 +8,7 @@ public class MyNN {
     private final IActivations activation;
     private final int nrOfLayers;
     private final int[][] dims;
+    private final IActivations lastActivation;
     private double[][] z;
     private double[][] a;
     private final double learningRate;
@@ -18,7 +19,22 @@ public class MyNN {
             layers[i] = new Dense(dims[i][0], dims[i][1]);
         }
         this.activation = activation;
+        this.lastActivation = activation;
         this.dims = dims;
+        this.nrOfLayers = nrOfLayers;
+        this.learningRate = learningRate;
+        z = new double[nrOfLayers][];
+        a = new double[nrOfLayers+1][];
+    }
+
+    public MyNN(int nrOfLayers, int[][] dims, IActivations activation, double learningRate, IActivations lastActivation){
+        layers = new Dense[nrOfLayers];
+        for (int i = 0; i < layers.length; i++) {
+            layers[i] = new Dense(dims[i][0], dims[i][1]);
+        }
+        this.activation = activation;
+        this.dims = dims;
+        this.lastActivation = lastActivation;
         this.nrOfLayers = nrOfLayers;
         this.learningRate = learningRate;
         z = new double[nrOfLayers][];
@@ -27,17 +43,30 @@ public class MyNN {
 
     public double[] forward(double[] features){
         a[0] = features;
-        for (int i = 0; i < nrOfLayers; i++) {
+        for (int i = 0; i < nrOfLayers-1; i++) {
             z[i] = layers[i].forward(a[i]);
             a[i+1] = activation.forward(z[i]);
         }
+        z[nrOfLayers-1] = layers[nrOfLayers-1].forward(a[nrOfLayers-1]);
+        a[nrOfLayers] = lastActivation.forward(z[nrOfLayers-1]);
         return a[nrOfLayers];
     }
 
     public void backward(double actual, double predicted, MSE loss){
         double[][] deltas = new double[nrOfLayers][];
         deltas[nrOfLayers-1] = Arrays.stream(z[nrOfLayers-1])
-                .map(i -> activation.derivedA(i)*loss.derivedLoss(actual, predicted)).toArray();
+                .map(i -> lastActivation.derivedA(i)*loss.derivedLoss(actual, predicted)).toArray();
+        backwardsUtil(deltas);
+    }
+
+    public void backward(double[] actual, double[] predicted, ILoss loss){
+        double[][] deltas = new double[nrOfLayers][];
+        deltas[nrOfLayers-1] = new double[layers[nrOfLayers-1].getOut()];
+        Arrays.setAll(deltas[nrOfLayers-1], i -> lastActivation.derivedA(z[nrOfLayers-1])[i]*loss.derivedLoss(actual[i], predicted[i]));
+        backwardsUtil(deltas);
+    }
+
+    private void backwardsUtil(double[][] deltas) {
         layers[nrOfLayers-1].updateWeightGrad(updateLayerGrad(layers[nrOfLayers-1].getOut()
                 , layers[nrOfLayers-1].getIn(), deltas[nrOfLayers-1], a[nrOfLayers-1]));
         layers[nrOfLayers-1].updateBias(deltas[nrOfLayers-1]);
@@ -69,10 +98,21 @@ public class MyNN {
     }
 
 
-    private void step() {
+    public void step() {
         for(Dense layer: layers){
             layer.step(learningRate);
         }
+    }
+
+    public double[] softmax(double[] pred){
+        double sum = 0;
+        for (double v : pred) {
+            sum += Math.exp(Math.min(Double.MAX_EXPONENT, v));
+        }
+        for (int i = 0; i < pred.length; i++) {
+            pred[i] = Math.exp(pred[i])/ sum;
+        }
+        return pred;
     }
 
 
