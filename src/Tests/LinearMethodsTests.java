@@ -1,5 +1,6 @@
 package Tests;
 
+import utils.TrainableApproximators.FourierBasis;
 import utils.TrainableApproximators.LinearCombination;
 import utils.TrainableApproximators.PolynomialLinearCombination;
 import org.junit.Test;
@@ -51,5 +52,20 @@ public class LinearMethodsTests {
         assertEquals(linearCombination.sumFeatureWeights(testFeatures), actual, 0.0001);
         System.out.println("Sum of weight[i] * feature[i]: " + linearCombination.sumFeatureWeights(testFeatures) + "\n");
 
+    }
+
+
+    @Test
+    public void fourierBasisTest(){
+        FourierBasis fb = new FourierBasis(3, 0.01);
+        Random random = new Random();
+        random.setSeed(31);
+        double[] testFeatures = random.doubles(3).toArray();
+        double actual = 1.0;
+        do {
+            fb.updateWeights(actual, fb.predict(testFeatures), testFeatures);
+        }while (!(Math.abs(actual - fb.predict(testFeatures)) < 0.0001));
+        assertEquals(fb.predict(testFeatures), actual, 0.0001);
+        System.out.println("Sum of weight[i] * feature[i]: " + fb.predict(testFeatures) + "\n");
     }
 }
