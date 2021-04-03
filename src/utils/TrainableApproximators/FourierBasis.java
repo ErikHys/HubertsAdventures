@@ -8,7 +8,7 @@ public class FourierBasis {
     double alpha;
 
     public FourierBasis(int weights, double alpha){
-        Random random = new Random(27);
+        Random random = new Random();
         this.weights = random.ints(weights, -10, 10).mapToDouble(i -> (double) i).toArray();
         this.alpha = alpha;
     }
@@ -24,6 +24,13 @@ public class FourierBasis {
                 (Math.PI *(-state[i])*Math.sin(Math.PI * vectorMul(state, weights))));
         weights = newWeights;
 
+    }
+
+    public double[] getGradient(double[] state){
+        double alphaI = getAlpha();
+        double[] newWeights = new double[weights.length];
+        Arrays.setAll(newWeights, i-> (Math.PI *(-state[i])*Math.sin(Math.PI * vectorMul(state, weights))));
+        return newWeights;
     }
 
     public double getAlpha(){

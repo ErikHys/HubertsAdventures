@@ -61,7 +61,7 @@ public class LinearMethodsTests {
         Random random = new Random();
         random.setSeed(31);
         double[] testFeatures = random.doubles(3).toArray();
-        double actual = 1.0;
+        double actual = -0.5;
         do {
             fb.updateWeights(actual, fb.predict(testFeatures), testFeatures);
         }while (!(Math.abs(actual - fb.predict(testFeatures)) < 0.0001));
