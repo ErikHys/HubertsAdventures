@@ -14,6 +14,10 @@ public class FourierBasis {
     }
 
     public double predict(double[] state){
+        state[3] = (state[3] + 1)/2;
+        state[0] /= 10;
+        state[1] /= 10;
+        state[2] /= 10;
         return Math.cos(Math.PI * vectorMul(state, weights));
     }
 
@@ -53,5 +57,9 @@ public class FourierBasis {
         double[] result = new double[a.length];
         Arrays.setAll(result, i -> a[i] * b[i]);
         return Arrays.stream(result).sum();
+    }
+
+    public double[] getWeights() {
+        return weights;
     }
 }
