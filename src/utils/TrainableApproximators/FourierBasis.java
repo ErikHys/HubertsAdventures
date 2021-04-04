@@ -26,6 +26,15 @@ public class FourierBasis {
 
     }
 
+    public void updateWeights(double delta, double[] state){
+        double alphaI = getAlpha();
+        double[] newWeights = new double[weights.length];
+        Arrays.setAll(newWeights, i-> weights[i] + alphaI*delta*
+                (Math.PI *(-state[i])*Math.sin(Math.PI * vectorMul(state, weights))));
+        weights = newWeights;
+
+    }
+
     public double[] getGradient(double[] state){
         double alphaI = getAlpha();
         double[] newWeights = new double[weights.length];

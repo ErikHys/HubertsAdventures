@@ -7,6 +7,7 @@ import java.util.Random;
 public class BeltSimulator {
     private final FourierBasis fb;
     private final double beta;
+    private double avgR;
     private Random random;
     private Cookie cookie;
     private Hubert hubert;
@@ -18,6 +19,7 @@ public class BeltSimulator {
         this.cookie = new Cookie(10.0*random.nextDouble());
         this.fb = new FourierBasis(4, 0.01);
         this.beta = 0.01;
+        this.avgR = 0;
     }
 
     public void randomStep(){
@@ -27,16 +29,25 @@ public class BeltSimulator {
 
     }
 
-    public double fourierBasisStep(){
+    /**
+     * TODO fix to nstep
+     * @param action
+     * @return
+     */
+    public int fourierBasisStep(int action){
+        double[] oldState = new double[]{hubert.getPosition(), hubert.getVelocity(), cookie.getPosition(), action};
         double lastPos = hubert.getPosition();
         double currentCost = hubert.getCost();
-        int action = getFourierStep();
         hubert.doAction(action);
         baseStep(lastPos);
         double newCost = hubert.getCost();
-        return newCost-currentCost;
-
-
+        double r = newCost-currentCost;
+        int actionPrime = getFourierStep();
+        double delta = r - avgR + fb.predict(new double[]{hubert.getPosition(), hubert.getVelocity(), cookie.getPosition(), actionPrime})
+                - fb.predict(oldState);
+        avgR += beta*delta;
+        fb.updateWeights(delta, oldState);
+        return actionPrime;
     }
 
     private void baseStep(double lastPos) {
@@ -65,11 +76,13 @@ public class BeltSimulator {
         Hubert hubert = new Hubert(5.0);
         BeltSimulator beltSimulator = new BeltSimulator(hubert);
 
-        for (int i = 0; i < 100000000; i++) {
-            double r = beltSimulator.fourierBasisStep();
+        int action = 0;
+        for (int i = 0; i < 1000000000; i++) {
+
+             action = beltSimulator.fourierBasisStep(action);
 
         }
-        System.out.println(5*hubert.getCost()/100000000);
+        System.out.println(beltSimulator.avgR);
 
     }
 }
