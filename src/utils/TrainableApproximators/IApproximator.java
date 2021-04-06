@@ -1,8 +1,9 @@
 package utils.TrainableApproximators;
 
-public interface IApproximator<In, Out> {
+public interface IApproximator {
 
-    public Out predict(In s);
-    public void updateWeights(Out actual, Out predicted, In features);
+    public double predict(double[] s);
+    public void updateWeights(double actual, double predicted, double[] features);
+    public void updateWeights(double delta, double[] features);
 
 }

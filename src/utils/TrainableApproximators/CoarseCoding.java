@@ -28,11 +28,10 @@ public class CoarseCoding{
                 circles[i][j] = new Circle(new Vector2D(1/(double)nrOfWeightsPerTile * j, 1/(double)nrOfWeightsPerTile * i), 1/(double)nrOfWeightsPerTile);
             }
         }
-        Random random = new Random();
         weights = new double[height*nrOfWeightsPerTile][width*nrOfWeightsPerTile];
         for (int i = 0; i < circles.length; i++) {
             double[] row = new double[weights[i].length];
-            Arrays.setAll(row, j -> 0);
+            Arrays.fill(row, 0);
             weights[i] = row;
         }
 

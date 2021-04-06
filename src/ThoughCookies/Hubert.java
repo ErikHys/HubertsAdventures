@@ -1,7 +1,5 @@
 package ThoughCookies;
 
-import java.util.Random;
-
 public class Hubert {
 
     private final double timeStep;
@@ -45,23 +43,13 @@ public class Hubert {
         cost += kr;
     }
 
-    public static void main(String[] args) {
-//        Hubert hubert = new Hubert(0);
-//        while (hubert.getPosition() < 10){
-//            System.out.println(hubert.doAction(1));
-//        }
-//        while (hubert.getPosition() > 0){
-//            System.out.println(hubert.doAction(-1));
-//        }
-        Random random = new Random();
-        for (int i = 0; i < 100; i++) {
-            System.out.println(random.nextInt(3));
-        }
-
-
-    }
-
     public double getCost() {
         return cost;
+    }
+
+    public void reset(){
+        cost = 0;
+        position = 5.0;
+        velocity = 0;
     }
 }

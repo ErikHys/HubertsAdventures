@@ -3,7 +3,7 @@ package utils.TrainableApproximators;
 import java.util.Arrays;
 import java.util.Random;
 
-public class FourierBasis {
+public class FourierBasis implements IApproximator{
     double[] weights;
     double alpha;
 
@@ -13,6 +13,7 @@ public class FourierBasis {
         this.alpha = alpha;
     }
 
+    @Override
     public double predict(double[] state){
         state[3] = (state[3] + 1)/2;
         state[0] /= 10;
@@ -21,6 +22,7 @@ public class FourierBasis {
         return Math.cos(Math.PI * vectorMul(state, weights));
     }
 
+    @Override
     public void updateWeights(double actual, double predicted, double[] state){
         double alphaI = getAlpha();
         double[] newWeights = new double[weights.length];
@@ -30,6 +32,7 @@ public class FourierBasis {
 
     }
 
+    @Override
     public void updateWeights(double delta, double[] state){
         double alphaI = getAlpha();
         double[] newWeights = new double[weights.length];

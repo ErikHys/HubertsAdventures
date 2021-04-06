@@ -36,21 +36,28 @@ public class LinearMethodsTests {
 
     @Test
     public void updatePloyWeightsTest(){
-        PolynomialLinearCombination linearCombination = new PolynomialLinearCombination(4, 0.1);
+        PolynomialLinearCombination linearCombination = new PolynomialLinearCombination(4, 0.001);
         Random random = new Random();
         random.setSeed(31);
-        double[] testFeatures = new double[4];
-        Arrays.setAll(testFeatures, i -> random.nextDouble());
+        int nSamples = 13;
+        double[][] testFeatures = new double[nSamples][4];
+        for (int i = 0; i < nSamples; i++) {
+            testFeatures[i] = random.doubles(4).toArray();
+        }
 
-        double actual = random.nextDouble();
-        System.out.println("\nTarget: " + actual + "\n");
+
+        double[] actual = random.doubles(nSamples).toArray();
+        System.out.println("\nTarget: " + actual[7] + "\n");
 
         do {
-            linearCombination.updateWeights(actual, linearCombination.sumFeatureWeights(testFeatures), testFeatures);
+            for (int i = 0; i < nSamples; i++) {
+                linearCombination.updateWeights(actual[i], linearCombination.sumFeatureWeights(testFeatures[i]), testFeatures[i]);
 
-        } while (!(Math.abs(actual - linearCombination.sumFeatureWeights(testFeatures)) < 0.0001));
-        assertEquals(linearCombination.sumFeatureWeights(testFeatures), actual, 0.0001);
-        System.out.println("Sum of weight[i] * feature[i]: " + linearCombination.sumFeatureWeights(testFeatures) + "\n");
+            }
+
+        } while (!(Math.abs(actual[7] - linearCombination.sumFeatureWeights(testFeatures[7])) < 0.0001));
+        assertEquals(linearCombination.sumFeatureWeights(testFeatures[7]), actual[7], 0.0001);
+        System.out.println("Sum of weight[i] * feature[i]: " + linearCombination.sumFeatureWeights(testFeatures[7]) + "\n");
 
     }
 
