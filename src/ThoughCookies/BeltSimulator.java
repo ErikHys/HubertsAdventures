@@ -1,9 +1,12 @@
 package ThoughCookies;
 
+import utils.ReadAndWrite;
 import utils.TrainableApproximators.FourierBasis;
 import utils.TrainableApproximators.IApproximator;
 import utils.TrainableApproximators.LinearCombination;
+import utils.Vector2D;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -93,10 +96,10 @@ public class BeltSimulator {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Thread[] threads = new Thread[16];
+        Thread[] threads = new Thread[1];
 
-        double[] betas = new double[]{0.1, 0.001, 0.0001, 0.00001};
-        double[] alphas = new double[]{0.1, 0.01, 0.001, 0.0001};
+        double[] betas = new double[]{0.1, 0.01, 0.001, 0.0001, 0.00001};
+        double[] alphas = new double[]{0.01, 0.001, 0.0001, 0.00001};
         int idx = 0;
         for (double beta: betas){
             for (double alpha: alphas){
@@ -112,9 +115,15 @@ public class BeltSimulator {
                     hubert.reset();
                     beltSimulator.avgR = 0;
                     action = 0;
+                    Vector2D[] path = new Vector2D[1000];
                     for (int i = 0; i < 1000; i++) {
-
+                        path[i] = new Vector2D(hubert.getPosition(), beltSimulator.cookie.getPosition());
                         action = beltSimulator.fourierBasisOneStep(action);
+                    }
+                    try {
+                        ReadAndWrite.writePath(path, "cookiepath.txt");
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                     System.out.println(beta + " <- beta, alpha -> " + alpha);
                     System.out.println(beltSimulator.avgR);
