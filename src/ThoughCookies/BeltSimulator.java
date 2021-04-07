@@ -12,29 +12,20 @@ public class BeltSimulator {
     private final IApproximator fb;
     private final double beta;
     private final double epsilon;
-    private final ArrayList<Double> rewards;
-    private final ArrayList<double[]> states;
-    private final int nStep;
     private double avgR;
-    private Random random;
+    private final Random random;
     private Cookie cookie;
-    private Hubert hubert;
+    private final Hubert hubert;
 
 
-    public BeltSimulator(Hubert hubert, double beta, double lr, double epsilon, int nStep){
+    public BeltSimulator(Hubert hubert, double beta, double lr, double epsilon){
         random = new Random();
         this.hubert = hubert;
         this.cookie = new Cookie(10.0*random.nextDouble());
-        this.fb = new FourierBasis(3, lr);
+        this.fb = new FourierBasis(4, lr);
         this.beta = beta;
         this.avgR = 0;
         this.epsilon = epsilon;
-        this.nStep = nStep;
-        this.rewards = new ArrayList<>();
-        this.states = new ArrayList<>();
-        rewards.add(hubert.getCost());
-        double[] oldState = new double[]{hubert.getPosition(), hubert.getVelocity(), cookie.getPosition(), 0.0};
-        states.add(oldState);
 
     }
 
@@ -45,13 +36,8 @@ public class BeltSimulator {
 
     }
 
-    /**
-     * F me
-     * @param action
-     * @return
-     */
     public int fourierBasisOneStep(int action){
-        double[] oldState = new double[]{hubert.getPosition(), hubert.getVelocity(), cookie.getPosition()};
+        double[] oldState = new double[]{hubert.getPosition(), hubert.getVelocity(), cookie.getPosition(), cookie.getAge()};
         double lastPos = hubert.getPosition();
         double currentCost = hubert.getCost();
         hubert.doAction(action);
@@ -60,38 +46,10 @@ public class BeltSimulator {
         double r = newCost-currentCost;
         int actionPrime = getFourierStep();
         double oldPred = fb.predict(oldState);
-        double delta = r - avgR + fb.predict(new double[]{hubert.getPosition(), hubert.getVelocity(), cookie.getPosition()})
+        double delta = r - avgR + fb.predict(new double[]{hubert.getPosition(), hubert.getVelocity(), cookie.getPosition(), cookie.getAge()})
                 - oldPred;
         avgR += beta*delta;
         fb.updateWeights(delta, oldState);
-
-        return actionPrime;
-    }
-
-    public int fourierBasisNStep(int action){
-        double[] oldState = new double[]{hubert.getPosition(), hubert.getVelocity(), cookie.getPosition(), action};
-        double lastPos = hubert.getPosition();
-        double currentCost = hubert.getCost();
-        hubert.doAction(action);
-        baseStep(lastPos);
-        double newCost = hubert.getCost();
-        double r = newCost-currentCost;
-
-        int actionPrime = getFourierStep();
-        double[] newState = new double[]{hubert.getPosition(), hubert.getVelocity(), cookie.getPosition(), actionPrime};
-        rewards.add(r);
-        states.add(newState);
-        if(rewards.size()-nStep >= 0){
-            double[] result = new double[rewards.size()];
-            double lastPred = fb.predict(states.get(states.size()-1));
-            double firstPred = fb.predict(states.get(0));
-            Arrays.setAll(result, i -> rewards.get(i)-avgR + lastPred - firstPred);
-            double delta = Arrays.stream(result).sum();
-            avgR += beta*delta;
-            fb.updateWeights(delta, oldState);
-            rewards.remove(0);
-            states.remove(0);
-        }
 
         return actionPrime;
     }
@@ -109,10 +67,9 @@ public class BeltSimulator {
         if(p < epsilon){
             moveIdx = random.nextInt(3)-1;
         }else {
-
             double moveValue = Double.NEGATIVE_INFINITY;
             for (int i = -1; i < 2; i++) {
-                double[] state = new double[]{hubert.getPosition(), hubert.getVelocity(), cookie.getPosition(), i};
+                double[] state = getNextState(i);
                 double value = fb.predict(state);
                 if (moveValue < value) {
                     moveIdx = i;
@@ -123,29 +80,56 @@ public class BeltSimulator {
         return moveIdx >= -1 ? moveIdx : random.nextInt(3)-1;
     }
 
+    private double[] getNextState(int i) {
+        double cPos = cookie.getPosition();
+        double hPos = hubert.nextPos(i);
+        double hVel = hubert.nextVel(i);
+        double cAge = cookie.getAge() + cookie.getTimeStep();
+        return new double[]{hPos, hVel, cPos, cAge};
+    }
+
     public IApproximator getFb() {
         return fb;
     }
 
-    public static void main(String[] args) {
-        Hubert hubert = new Hubert(5.0);
-        BeltSimulator beltSimulator = new BeltSimulator(hubert, 0.0001, 0.01, 0.05, 5);
+    public static void main(String[] args) throws InterruptedException {
+        Thread[] threads = new Thread[16];
 
-        int action = 0;
-        for (int i = 0; i < 10000000; i++) {
+        double[] betas = new double[]{0.1, 0.001, 0.0001, 0.00001};
+        double[] alphas = new double[]{0.1, 0.01, 0.001, 0.0001};
+        int idx = 0;
+        for (double beta: betas){
+            for (double alpha: alphas){
+                Thread thread = new Thread(() -> {
+                    Hubert hubert = new Hubert(5.0);
+                    BeltSimulator beltSimulator = new BeltSimulator(hubert, beta, alpha, 0.05);
 
-             action = beltSimulator.fourierBasisOneStep(action);
-//             beltSimulator.randomStep();
+                    int action = 0;
+                    for (int i = 0; i < 1000000; i++) {
+
+                        action = beltSimulator.fourierBasisOneStep(action);
+                    }
+                    hubert.reset();
+                    beltSimulator.avgR = 0;
+                    action = 0;
+                    for (int i = 0; i < 1000; i++) {
+
+                        action = beltSimulator.fourierBasisOneStep(action);
+                    }
+                    System.out.println(beta + " <- beta, alpha -> " + alpha);
+                    System.out.println(beltSimulator.avgR);
+                    System.out.println(hubert.getCost());
+                    System.out.println();
+                });
+                thread.start();
+                threads[idx] = thread;
+                idx++;
+            }
         }
-        hubert.reset();
-        action = 0;
-        for (int i = 0; i < 1000; i++) {
-
-            action = beltSimulator.fourierBasisOneStep(action);
-//             beltSimulator.randomStep();
+        for(Thread t: threads){
+            t.join();
         }
-        System.out.println(beltSimulator.avgR);
-        System.out.println(hubert.getCost());
+
 
     }
 }

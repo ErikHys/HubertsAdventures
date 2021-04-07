@@ -52,4 +52,12 @@ public class Hubert {
         position = 5.0;
         velocity = 0;
     }
+
+    public double nextPos(int i) {
+        return position > 10 || position < 0 ?  position < 0 ? 0 : 10 : position + nextVel(i)*timeStep;
+    }
+
+    public double nextVel(int i) {
+        return velocity + (i*5.0 + (- Math.abs(velocity)*velocity * 0.05)) * timeStep;
+    }
 }

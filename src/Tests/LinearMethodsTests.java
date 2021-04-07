@@ -64,13 +64,14 @@ public class LinearMethodsTests {
 
     @Test
     public void fourierBasisTest(){
-        FourierBasis fb = new FourierBasis(3, 0.01);
+        FourierBasis fb = new FourierBasis(3, 0.1);
         Random random = new Random();
         random.setSeed(31);
         double[] testFeatures = random.doubles(3).toArray();
         double actual = -0.5;
         do {
             fb.updateWeights(actual, fb.predict(testFeatures), testFeatures);
+            System.out.println(fb.predict(testFeatures));
         }while (!(Math.abs(actual - fb.predict(testFeatures)) < 0.0001));
         assertEquals(fb.predict(testFeatures), actual, 0.0001);
         System.out.println("Sum of weight[i] * feature[i]: " + fb.predict(testFeatures) + "\n");

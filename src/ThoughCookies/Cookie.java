@@ -22,4 +22,8 @@ public class Cookie {
     public double getPosition() {
         return position;
     }
+
+    public double getTimeStep() {
+        return timeStep;
+    }
 }
