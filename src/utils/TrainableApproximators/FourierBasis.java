@@ -4,54 +4,56 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class FourierBasis implements IApproximator{
-    double[] weights;
+    private final int order;
+    double[][] cWeights;
     double alpha;
 
-    public FourierBasis(int weights, double alpha){
-        Random random = new Random();
-        this.weights = random.ints(weights, -10, 10).mapToDouble(i -> (double) i).toArray();
+    public FourierBasis(int cWeights, double alpha){
+        Random random = new Random(27);
+        order = 1;
         this.alpha = alpha;
+        this.cWeights = new double[(int) Math.pow(order+1, cWeights)][cWeights];
+        Arrays.setAll(this.cWeights, j -> random.ints(cWeights, 0, order+1).mapToDouble(i -> (double) i).toArray());
+
+
     }
 
     @Override
     public double predict(double[] state){
-        state[3] = (state[3] + 1)/2;
-        state[0] /= 10;
-        state[1] /= 10;
-        state[2] /= 10;
-        return Math.cos(Math.PI * vectorMul(state, weights));
+        return Arrays.stream(cWeights).map(i -> Math.cos(Math.PI * vectorMul(state, i))).mapToDouble(Double::doubleValue).sum();
     }
 
     @Override
     public void updateWeights(double actual, double predicted, double[] state){
-        double alphaI = getAlpha();
-        double[] newWeights = new double[weights.length];
-        Arrays.setAll(newWeights, i-> weights[i] + alphaI*(actual - predicted)*
-                (Math.PI *(-state[i])*Math.sin(Math.PI * vectorMul(state, weights))));
-        weights = newWeights;
+//        double alphaI = getAlpha();
+//        double[] newcWeights = new double[cWeights.length];
+//        Arrays.setAll(newcWeights, i-> cWeights[i] + alphaI*(actual - predicted)*
+//                (Math.PI *(-state[i])*Math.sin(Math.PI * vectorMul(state, cWeights))));
+//        cWeights = newcWeights;
 
     }
 
     @Override
     public void updateWeights(double delta, double[] state){
-        double alphaI = getAlpha();
-        double[] newWeights = new double[weights.length];
-        Arrays.setAll(newWeights, i-> weights[i] + alphaI*delta*
-                (Math.PI *(-state[i])*Math.sin(Math.PI * vectorMul(state, weights))));
-        weights = newWeights;
+//        double alphaI = getAlpha();
+//        double[] newcWeights = new double[cWeights.length];
+//        Arrays.setAll(newcWeights, i-> cWeights[i] + alphaI*delta*
+//                (Math.PI *(-state[i])*Math.sin(Math.PI * vectorMul(state, cWeights))));
+//        cWeights = newcWeights;
 
     }
 
     public double[] getGradient(double[] state){
-        double alphaI = getAlpha();
-        double[] newWeights = new double[weights.length];
-        Arrays.setAll(newWeights, i-> (Math.PI *(-state[i])*Math.sin(Math.PI * vectorMul(state, weights))));
-        return newWeights;
+//        double alphaI = getAlpha();
+//        double[] newcWeights = new double[cWeights.length];
+//        Arrays.setAll(newcWeights, i-> (Math.PI *(-state[i])*Math.sin(Math.PI * vectorMul(state, cWeights))));
+//        return newcWeights;
+        return null;
     }
 
-    public double getAlpha(){
-        double[] result = new double[weights.length];
-        Arrays.setAll(result, j -> Math.pow(weights[j], 2));
+    public double getAlpha(int i){
+        double[] result = new double[cWeights[i].length];
+        Arrays.setAll(result, j -> Math.pow(cWeights[i][j], 2));
         double ai = alpha/Math.sqrt(Arrays.stream(result).sum());
         return ai != 0 ? ai : alpha;
     }
@@ -62,7 +64,12 @@ public class FourierBasis implements IApproximator{
         return Arrays.stream(result).sum();
     }
 
-    public double[] getWeights() {
-        return weights;
+    public double[][] getcWeights() {
+        return cWeights;
+    }
+
+    public static void main(String[] args) {
+        FourierBasis fb = new FourierBasis(2, 0.1);
+        System.out.println(fb.predict(new double[]{1, 0}));
     }
 }
